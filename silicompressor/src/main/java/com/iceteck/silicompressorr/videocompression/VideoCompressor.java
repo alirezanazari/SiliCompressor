@@ -804,13 +804,28 @@ public class VideoCompressor {
         }
     }
 
+    /**
+     * Compress video and release static variables
+     */
+    public String compress(final String sourcePath, File destDir, int outWidth, int outHeight, int outBitrate) {
+        boolean isConverted = convertVideo(null, null, sourcePath, destDir, outWidth, outHeight, outBitrate);
+        if (isConverted) {
+            String path = cachedFile.getPath();
+            release();
+            return path;
+        } else {
+            release();
+            return null;
+        }
+    }
+
     private void log(String message) {
         if (BuildConfig.DEBUG) {
             Log.d(this.getClass().getSimpleName(), message);
         }
     }
 
-    public void release() {
+    private void release() {
         mContext = null;
         Instance = null;
         cachedFile = null;
