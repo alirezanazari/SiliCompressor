@@ -4,9 +4,6 @@ A powerful, flexible and easy to use Video and Image compression library for And
 
 Description
 --------
-#### Image 
-It's usually said that "A picture is worth a thousand words". Images adds flair and beauty to our android apps, but we usaully have problems with these images due to thier large size. With SiliCompressor you can now compress and use your images more smoothly.
-
 #### Video
 Due to the high resolution of our Smartphone cameras and cameras from other devices, Video files have become large in size and thus difficult for it to be shared with others on social apps, social media and even when we need to upload it on our server. With SiliCompressor you can now compress you video file while maintaining it quality.
 
@@ -14,71 +11,6 @@ Credit
 --------
 The image compressor part of this project is inspired from [Void Canvas] blog from which the core part of the compressor was done.
 For the Video Compression part of this project, credit goes to [Jorge E. Hernandez (@lalongooo)] whose codes was used for the core part of the video compressor module.
-
-Usage
---------
-To effectively use this library, you must make sure you have added the following permission to your project.
-```java
-<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
-<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
-```
-#### Compress a video file and return the file path of the new video
-```java
-String filePath = SiliCompressor.with(Context).compressVideo(videoUriString, destinationDirectory);
-```
-```java
-String filePath = SiliCompressor.with(Context).compressVideo(videoContentUri, destinationDirectory);
-```
-#### Compress an image and return the file path of the new image
-```java
-String filePath = SiliCompressor.with(Context).compress(uriString, destinationDirectory);
-```
-#### Compress an image and return the file path of the new image while deleting the source image
-```java
-String filePath = SiliCompressor.with(Context).compress(uriString, destinationDirectory, true);
-```
-
-#### Compress an image drawable and return the file path of the new image
-```java
-String filePath = SiliCompressor.with(Context).compress(R.drawable.icon);
-```
-
-#### Compress an image and return the bitmap data of the new image
-```java
-Bitmap imageBitmap = SiliCompressor.with(Context).getCompressBitmap(imageUriString);
-```
-
-#### Compress an image and return the bitmap data of the new image while deleting the source image
-```java
-Bitmap imageBitmap = SiliCompressor.with(Context).getCompressBitmap(imageUriString, true);
-```
-
-
-Download
---------
-#### Gradle
-```groovy
-implementation 'com.iceteck.silicompressorr:silicompressor:2.2.4'
-```
-
-##### Maven
-```xml
-<dependency>
-  <groupId>com.iceteck.silicompressorr</groupId>
-  <artifactId>silicompressor</artifactId>
-  <version>2.2.4</version>
-  <type>aar</type>
-</dependency>
-```
-
-##### Ivy
-```xml
-<dependency org='com.iceteck.silicompressorr' name='silicompressor' rev='2.2.4'>
-  <artifact name='silicompressor' ext='pom' ></artifact>
-</dependency>
-```
-
-Snapshots of the development version are available in [Sonatype's `snapshots` repository][snap].
 
 License
 --------
