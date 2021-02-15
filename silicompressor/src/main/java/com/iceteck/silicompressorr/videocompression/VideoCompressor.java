@@ -20,6 +20,8 @@ import android.os.Environment;
 import android.os.ParcelFileDescriptor;
 import android.util.Log;
 
+import com.iceteck.silicompressorr.BuildConfig;
+
 import java.io.File;
 import java.io.FileDescriptor;
 import java.io.FileInputStream;
@@ -33,7 +35,7 @@ import java.util.Date;
 import java.util.Locale;
 
 @SuppressLint("NewApi")
-public class MediaController {
+public class VideoCompressor {
 
     public static File cachedFile;
     public String path;
@@ -46,7 +48,7 @@ public class MediaController {
     private final static int PROCESSOR_TYPE_MTK = 3;
     private final static int PROCESSOR_TYPE_SEC = 4;
     private final static int PROCESSOR_TYPE_TI = 5;
-    private static volatile MediaController Instance = null;
+    private static volatile VideoCompressor Instance = null;
     private boolean videoConvertFirstWrite = true;
 
     //Default values
@@ -54,14 +56,14 @@ public class MediaController {
     private final static int DEFAULT_VIDEO_HEIGHT = 360;
     private final static int DEFAULT_VIDEO_BITRATE = 450000;
 
-    public static MediaController getInstance(Context context) {
-        MediaController localInstance = Instance;
+    public static VideoCompressor getInstance(Context context) {
+        VideoCompressor localInstance = Instance;
         mContext = context;
         if (localInstance == null) {
-            synchronized (MediaController.class) {
+            synchronized (VideoCompressor.class) {
                 localInstance = Instance;
                 if (localInstance == null) {
-                    Instance = localInstance = new MediaController();
+                    Instance = localInstance = new VideoCompressor();
                 }
             }
         }
@@ -445,11 +447,11 @@ public class MediaController {
                             } else if (codecName.equals("OMX.TI.DUCATI1.VIDEO.H264E")) {
                                 processorType = PROCESSOR_TYPE_TI;
                             }
-                            Log.e("tmessages", "codec = " + codecInfo.getName() + " manufacturer = " + manufacturer + "device = " + Build.MODEL);
+                            log("codec = " + codecInfo.getName() + " manufacturer = " + manufacturer + "device = " + Build.MODEL);
                         } else {
                             colorFormat = MediaCodecInfo.CodecCapabilities.COLOR_FormatSurface;
                         }
-                        Log.e("tmessages", "colorFormat = " + colorFormat);
+                        log("colorFormat = " + colorFormat);
 
                         int resultHeightAligned = resultHeight;
                         int padding = 0;
@@ -637,7 +639,7 @@ public class MediaController {
 
                                     } else if (decoderStatus == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED) {
                                         MediaFormat newFormat = decoder.getOutputFormat();
-                                        Log.e("tmessages", "newFormat = " + newFormat);
+                                        log("newFormat = " + newFormat);
                                     } else if (decoderStatus < 0) {
                                         throw new RuntimeException("unexpected result from decoder.dequeueOutputBuffer: " + decoderStatus);
                                     } else {
@@ -656,7 +658,7 @@ public class MediaController {
                                         if (startTime > 0 && videoTime == -1) {
                                             if (info.presentationTimeUs < startTime) {
                                                 doRender = false;
-                                                Log.e("tmessages", "drop frame startTime = " + startTime + " present time = " + info.presentationTimeUs);
+                                                log("drop frame startTime = " + startTime + " present time = " + info.presentationTimeUs);
                                             } else {
                                                 videoTime = info.presentationTimeUs;
                                             }
@@ -668,7 +670,7 @@ public class MediaController {
                                                 outputSurface.awaitNewImage();
                                             } catch (Exception e) {
                                                 errorWait = true;
-                                                Log.e("tmessages", e.getMessage());
+                                                log(e.getMessage());
                                             }
                                             if (!errorWait) {
                                                 if (Build.VERSION.SDK_INT >= 18) {
@@ -685,14 +687,14 @@ public class MediaController {
                                                         convertVideoFrame(rgbBuf, yuvBuf, colorFormat, resultWidth, resultHeight, padding, swapUV);
                                                         encoder.queueInputBuffer(inputBufIndex, 0, bufferSize, info.presentationTimeUs, 0);
                                                     } else {
-                                                        Log.e("tmessages", "input buffer not available");
+                                                        log("input buffer not available");
                                                     }
                                                 }
                                             }
                                         }
                                         if ((info.flags & MediaCodec.BUFFER_FLAG_END_OF_STREAM) != 0) {
                                             decoderOutputAvailable = false;
-                                            Log.e("tmessages", "decoder stream end");
+                                            log("decoder stream end");
                                             if (Build.VERSION.SDK_INT >= 18) {
                                                 encoder.signalEndOfInputStream();
                                             } else {
@@ -710,7 +712,7 @@ public class MediaController {
                             videoStartTime = videoTime;
                         }
                     } catch (Exception e) {
-                        Log.e("tmessages", e.getMessage());
+                        log(e.getMessage());
                         error = true;
                     }
 
@@ -738,7 +740,7 @@ public class MediaController {
                 }
             } catch (Exception e) {
                 error = true;
-                Log.e("tmessages", e.getMessage());
+                log(e.getMessage());
             } finally {
                 if (extractor != null) {
                     extractor.release();
@@ -747,10 +749,10 @@ public class MediaController {
                     try {
                         mediaMuxer.finishMovie(false);
                     } catch (Exception e) {
-                        Log.e("tmessages", e.getMessage());
+                        log(e.getMessage());
                     }
                 }
-                Log.e("tmessages", "time = " + (System.currentTimeMillis() - time));
+                log("time = " + (System.currentTimeMillis() - time));
             }
         } else {
             didWriteData(true, true);
@@ -761,13 +763,13 @@ public class MediaController {
         cachedFile = cacheFile;
 
 
-        Log.e("ViratPath", path + "");
-        Log.e("ViratPath", cacheFile.getPath() + "");
+        log(path + "");
+        log(cacheFile.getPath() + "");
         if (sourcePath != null) {
-            Log.e("SourcePath", sourcePath);
+            log(sourcePath);
         }
         if (videoContentUri != null) {
-            Log.e("VideoUri", videoContentUri.toString());
+            log(videoContentUri.toString());
         }
 
 
@@ -779,35 +781,6 @@ public class MediaController {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             String fileName = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(new Date()) + ".mp4";
-/*            ContentValues values = new ContentValues();
-            values.put(MediaStore.Video.Media.DISPLAY_NAME, fileName);
-            values.put(MediaStore.Video.Media.TITLE, fileName);
-            values.put(MediaStore.Video.Media.MIME_TYPE, "video/mp4");
-            values.put(MediaStore.Video.Media.RELATIVE_PATH, "Movies/SiliCompressor/");
-            values.put(MediaStore.Video.Media.IS_PENDING, 1);
-
-            Uri collection = MediaStore.Video.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY);
-            Uri resultUri = mContext.getContentResolver().insert(collection, values);
-
-            if (resultUri != null) {
-                try (ParcelFileDescriptor pfd = mContext.getContentResolver().openFileDescriptor(resultUri, "w", null)) {
-                    OutputStream outputStream = null;
-                    if (pfd != null) {
-                        outputStream = mContext.getContentResolver().openOutputStream(resultUri);
-                        outputStream.flush();
-                        outputStream.close(); new FileOutputStream(pfd.getFileDescriptor())
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            values.clear();
-            values.put(MediaStore.Video.Media.IS_PENDING, 0);
-            mContext.getContentResolver().update(resultUri, values, null, null);
-
-*/
-
 
             File file = new File(mContext.getExternalFilesDir(
                     Environment.DIRECTORY_MOVIES), fileName);
@@ -817,10 +790,8 @@ public class MediaController {
                 e.printStackTrace();
             }
             if (file == null || !file.mkdirs()) {
-                Log.e("Sili", "Directory not created");
+                log("Directory not created");
             }
-
-//            Uri test = GenericFileProvider.getUriForFile(mContext, mContext.getPackageName()+".iceteck.silicompressor.provider", file);
 
             return file.getPath();
 
@@ -828,15 +799,27 @@ public class MediaController {
             if (!destDirectory.exists()) {
                 destDirectory.mkdirs();
             }
-            return (destDirectory.getAbsolutePath() + "/VIDEO_" + new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date()) + extension);
+            return (destDirectory.getAbsolutePath() + "/VIDEO_" + new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(new Date()) + extension);
 
         }
     }
 
+    private void log(String message) {
+        if (BuildConfig.DEBUG) {
+            Log.d(this.getClass().getSimpleName(), message);
+        }
+    }
+
+    public void release() {
+        mContext = null;
+        Instance = null;
+        cachedFile = null;
+    }
+
     public static class VideoConvertRunnable implements Runnable {
 
-        private String videoPath;
-        private File destDirectory;
+        private final String videoPath;
+        private final File destDirectory;
 
         private VideoConvertRunnable(String videoPath, File dest) {
             this.videoPath = videoPath;
@@ -853,7 +836,7 @@ public class MediaController {
                         th.start();
                         th.join();
                     } catch (Exception e) {
-                        Log.e("tmessages", e.getMessage());
+                        e.printStackTrace();
                     }
                 }
             }).start();
@@ -861,7 +844,7 @@ public class MediaController {
 
         @Override
         public void run() {
-            MediaController.getInstance(mContext).convertVideo(videoPath, destDirectory);
+            VideoCompressor.getInstance(mContext).convertVideo(videoPath, destDirectory);
         }
     }
 }
