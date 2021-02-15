@@ -19,12 +19,8 @@ implementation "com.github.alirezanazari:silicompressor:3.0.0"
 ```
 
 ```
-VideoCompressor.getInstance(context).run {
-    convertVideo(videoPath, File(destinationDirectory), width, height, bitrate)
-    val compressedPath = VideoCompressor.cachedFile.path.also {
-       release()
-    }
-}
+val compressedPath = VideoCompressor.getInstance(context)
+        .compress(videoPath, File(destinationDirectory), width, height, bitrate)
 ```
 
 License
