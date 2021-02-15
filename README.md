@@ -12,6 +12,21 @@ Credit
 The image compressor part of this project is inspired from [Void Canvas] blog from which the core part of the compressor was done.
 For the Video Compression part of this project, credit goes to [Jorge E. Hernandez (@lalongooo)] whose codes was used for the core part of the video compressor module.
 
+Usage
+--------
+```
+implementation "com.github.alirezanazari:silicompressor:3.0.0"
+```
+
+```
+VideoCompressor.getInstance(context).run {
+    convertVideo(videoPath, File(destinationDirectory), width, height, bitrate)
+    val compressedPath = VideoCompressor.cachedFile.path.also {
+       release()
+    }
+}
+```
+
 License
 --------
 Copyright 2016 [Teyou Toure Nathan][toure]
